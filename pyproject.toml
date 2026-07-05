@@ -1,0 +1,68 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "sqlalchemy-xa-recovery"
+version = "0.1.0"
+description = "Recoverable two-phase transaction helpers for SQLAlchemy"
+readme = "README.md"
+requires-python = ">=3.11"
+license = "MIT"
+license-files = ["LICENSE"]
+keywords = [
+    "2pc",
+    "distributed-transactions",
+    "mariadb",
+    "mysql",
+    "postgresql",
+    "prepared-transactions",
+    "sqlalchemy",
+    "transaction-coordinator",
+    "transaction-recovery",
+    "two-phase-commit",
+    "xa-transactions",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Programming Language :: Python :: 3 :: Only",
+    "Topic :: Database",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Typing :: Typed",
+]
+dependencies = [
+    "sqlalchemy[asyncio]>=2.0.50,<3",
+]
+
+[dependency-groups]
+dev = [
+    "aiomysql>=0.3.2",
+    "psycopg[binary,pool]>=3.3.3",
+    "pytest>=9.0.3",
+    "pytest-asyncio>=1.3.0",
+    "ruff>=0.15.12",
+    "testcontainers[mysql,postgres]>=4.14.2",
+    "ty>=0.0.32",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/sqlalchemy_xa_recovery"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = ["EM101", "TRY003", "TC001", "D", "TC002", "TC003"]
+
+[tool.ruff.lint.per-file-ignores]
+  "tests/**/*.py" = ["S101", "INP001"]
