@@ -1,0 +1,81 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  quality:
+    name: Quality
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+
+      - name: Install Python
+        run: uv python install 3.14
+
+      - name: Install dependencies
+        run: uv sync --python 3.14 --all-groups --frozen
+
+      - name: Check formatting
+        run: uv run --no-sync ruff format --check --config pyproject.toml
+
+      - name: Lint
+        run: uv run --no-sync ruff check --config pyproject.toml
+
+      - name: Type check
+        run: uv run --no-sync ty check .
+
+  tests:
+    name: Python ${{ matrix.python-version }} / ${{ matrix.sqlalchemy-label }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - python-version: "3.11"
+            sqlalchemy-label: "SQLAlchemy 2.0.50"
+            sqlalchemy-spec: "sqlalchemy[asyncio]==2.0.50"
+          - python-version: "3.12"
+            sqlalchemy-label: "latest SQLAlchemy 2.x"
+            sqlalchemy-spec: "sqlalchemy[asyncio]>=2,<3"
+          - python-version: "3.13"
+            sqlalchemy-label: "latest SQLAlchemy 2.x"
+            sqlalchemy-spec: "sqlalchemy[asyncio]>=2,<3"
+          - python-version: "3.14"
+            sqlalchemy-label: "latest SQLAlchemy 2.x"
+            sqlalchemy-spec: "sqlalchemy[asyncio]>=2,<3"
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+
+      - name: Install Python
+        run: uv python install ${{ matrix.python-version }}
+
+      - name: Install project dependencies
+        run: uv sync --python ${{ matrix.python-version }} --all-groups --frozen
+
+      - name: Select SQLAlchemy version
+        run: uv pip install --python .venv/bin/python --upgrade "${{ matrix.sqlalchemy-spec }}"
+
+      - name: Show versions
+        run: uv run --no-sync python -c "import sys, sqlalchemy; print(sys.version); print(sqlalchemy.__version__)"
+
+      - name: Run tests
+        run: uv run --no-sync pytest
