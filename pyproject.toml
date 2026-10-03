@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "sqlalchemy-xa-recovery"
-version = "0.1.0"
+version = "0.1.1"
 description = "Recoverable two-phase transaction helpers for SQLAlchemy"
 readme = "README.md"
 requires-python = ">=3.11"
