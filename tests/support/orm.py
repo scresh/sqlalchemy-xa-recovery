@@ -45,11 +45,7 @@ def rollback_prepared_transactions(engine: Engine) -> None:
     xid_prefix = XidPrefix()
 
     for xid in dialect.get_prepared_transactions(engine, xid_prefix):
-        try:
-            dialect.rollback_prepared_transaction(engine, xid)
-        except Exception as e:
-            if "ORA-24756" not in str(e):
-                raise
+        dialect.rollback_prepared_transaction(engine, xid)
 
 
 @asynccontextmanager
